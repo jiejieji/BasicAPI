@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:layout/pages/detail.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class Homepage extends StatefulWidget {
   //const Homepage({ Key? key }) : super(key: key);
@@ -18,20 +20,19 @@ class _HomepageState extends State<Homepage> {
       ),
      body: Padding(
           padding: EdgeInsets.all(20),
-          child: FutureBuilder( builder: (context, snapshot) {
-              var data = json.decode(snapshot.data.toString()); // 
+          child: FutureBuilder( builder: (context,AsyncSnapshot snapshot) {
+              //var data = json.decode(snapshot.data.toString()); // 
               return ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
-                    return MyBox(data[index]['title'], data[index]['subtitle'], data[index]['image_url'],data[index]['detail']);
-
+                    return MyBox(snapshot.data[index]['title'], snapshot.data[index]['subtitle'], snapshot.data[index]['image_url'],snapshot.data[index]['detail']);
                 
                 },
-                itemCount: data.length, );
+                itemCount: snapshot.data.length, );
 
           },
-          future: DefaultAssetBundle.of(context).loadString('assets/data.json'),
+          future:  getData(),
+          //future: DefaultAssetBundle.of(context).loadString('assets/data.json'), 
 
-  
 
         )
     ));
@@ -55,7 +56,7 @@ Widget MyBox(String title, String subtitle, String image_url, String detail) {
           image_url),
         fit: BoxFit.cover,
         colorFilter: ColorFilter.mode(
-          Colors.black.withOpacity(0.30), BlendMode.darken)
+          Colors.black.withOpacity(0.20), BlendMode.darken)
       ),
     ),
      child: Column(
@@ -82,4 +83,19 @@ Widget MyBox(String title, String subtitle, String image_url, String detail) {
       ),
     );
   }
+
+
+Future getData() async {
+  //https://raw.githubusercontent.com/jiejieji/BasicAPI/main/data.json
+  var url = Uri.https('raw.githubusercontent.com','jiejieji/BasicAPI/main/data.json');
+  var response = await http.get(url);
+  var result = json.decode(response.body);
+  return result; 
 }
+
+}
+
+
+
+
+
